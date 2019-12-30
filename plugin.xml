@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+<extension
+      id="saker.java.ide.eclipse.extension.ideConfigurationTypeHandler"
+      name="Java IDE configuration handler"
+      point="saker.build.ide.eclipse.extension.ideConfigurationTypeHandler">
+      <parser class="saker.java.ide.eclipse.JavaIDEConfigurationTypeHandler" type="saker.java.compile.ide.configuration" type_name="Java">
+      </parser>
+</extension>
+<extension
+      id="saker.java.ide.eclipse.extension.params.installation.environmentUserParameterContributor"
+      name="Java Installation Environment Parameter Contributor"
+      point="saker.build.ide.eclipse.extension.environmentUserParameterContributor">
+      <contributor
+            class="saker.java.ide.eclipse.params.JavaInstallationEnvironmentUserParameterContributor"></contributor>
+</extension>
+</plugin>
