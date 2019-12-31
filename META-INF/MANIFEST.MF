@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: saker.java.ide.eclipse
+Bundle-Name: Java IDE support for saker.build
 Bundle-SymbolicName: saker.java.ide.eclipse;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 0.8.0.qualifier
 Automatic-Module-Name: saker.java.ide.eclipse
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: saker.build.ide.eclipse;bundle-version="1.0.0",
@@ -13,3 +13,4 @@ Require-Bundle: saker.build.ide.eclipse;bundle-version="1.0.0",
  org.eclipse.swt;bundle-version="3.111.0",
  org.eclipse.jdt.ui;bundle-version="3.18.0",
  org.eclipse.ui;bundle-version="3.113.0"
+Bundle-Vendor: saker.build
