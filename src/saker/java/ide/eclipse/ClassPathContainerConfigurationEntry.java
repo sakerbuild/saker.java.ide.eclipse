@@ -35,8 +35,18 @@ public class ClassPathContainerConfigurationEntry extends AbstractIDEProjectConf
 
 	private List<ClassPathConfigurationEntry> classpathEntries = new ArrayList<>();
 	private transient Set<ClassPathConfigurationEntry> removalClasspathEntries = new LinkedHashSet<>();
+	private String label;
 
 	public ClassPathContainerConfigurationEntry() {
+		this("Classpath");
+	}
+
+	public ClassPathContainerConfigurationEntry(String label) {
+		this.label = label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	public void addClassPathEntry(ClassPathConfigurationEntry entry) {
@@ -84,7 +94,7 @@ public class ClassPathContainerConfigurationEntry extends AbstractIDEProjectConf
 
 	@Override
 	public String getLabel() {
-		return "Classpath";
+		return label;
 	}
 
 	@Override

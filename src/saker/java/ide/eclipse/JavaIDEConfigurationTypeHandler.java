@@ -122,6 +122,7 @@ public class JavaIDEConfigurationTypeHandler implements IIDEConfigurationTypeHan
 		Object sourcedirs = configuration.get(FIELD_SOURCE_DIRECTORIES);
 		Object modulepaths = configuration.get(FIELD_MODULEPATHS);
 		Object classpaths = configuration.get(FIELD_CLASSPATHS);
+		Object bootclasspaths = configuration.get(FIELD_BOOT_CLASSPATHS);
 		Object gendirs = configuration.get(FIELD_PROCESSOR_GEN_DIRECTORIES);
 		Object compilerinstalllocation = configuration.get(FIELD_COMPILER_JDKHOME);
 		File installlocfile = compilerinstalllocation instanceof String ? new File((String) compilerinstalllocation)
@@ -131,10 +132,13 @@ public class JavaIDEConfigurationTypeHandler implements IIDEConfigurationTypeHan
 		Object addexports = configuration.get(FIELD_ADDEXPORTS);
 		Collection<AddExportsData> addexportscoll = toAddExportsCollection(addexports);
 
-		VMInstallContainerConfigurationEntry jreentry = new VMInstallContainerConfigurationEntry();
 		SourceDirectoriesContainerConfigurationEntry sourcedirentry = new SourceDirectoriesContainerConfigurationEntry();
-		ClassPathContainerConfigurationEntry classpathsentry = new ClassPathContainerConfigurationEntry();
+		ClassPathContainerConfigurationEntry classpathsentry = new ClassPathContainerConfigurationEntry("Classpath");
 		ModulePathContainerConfigurationEntry modulepathsentry = new ModulePathContainerConfigurationEntry();
+		VMInstallContainerConfigurationEntry jreentry = new VMInstallContainerConfigurationEntry();
+
+		boolean hasbootclasspath = false;
+
 		if (sourcedirs instanceof Collection) {
 			Collection<?> sourcedirscoll = (Collection<?>) sourcedirs;
 			addSourceDirectories(project, sourcedirentry, sourcedirscoll, currentclasspath);
@@ -143,6 +147,10 @@ public class JavaIDEConfigurationTypeHandler implements IIDEConfigurationTypeHan
 			Collection<?> classpathscoll = (Collection<?>) classpaths;
 			addClassPathSourceDirectories(project, sourcedirentry, classpathscoll, currentclasspath);
 		}
+		//XXX don't add the source directories of the boot classpath? or should we?
+//		if (bootclasspaths instanceof Collection) {
+//			Collection<?> bootclasspathscoll = (Collection<?>) bootclasspaths;
+//		}
 		if (gendirs instanceof Collection) {
 			Collection<?> gendirscoll = (Collection<?>) gendirs;
 			addSourceGenDirectories(project, sourcedirentry, gendirscoll, currentclasspath);
@@ -151,6 +159,11 @@ public class JavaIDEConfigurationTypeHandler implements IIDEConfigurationTypeHan
 			Collection<?> modulepathscoll = (Collection<?>) modulepaths;
 			addModulePaths(project, modulepathsentry, modulepathscoll, currentclasspath);
 		}
+		if (bootclasspaths instanceof Collection) {
+			Collection<?> bootclasspathscoll = (Collection<?>) bootclasspaths;
+			hasbootclasspath = !bootclasspathscoll.isEmpty();
+			addClassPaths(project, classpathsentry, bootclasspathscoll, currentclasspath);
+		}
 		if (classpaths instanceof Collection) {
 			Collection<?> classpathscoll = (Collection<?>) classpaths;
 			addClassPaths(project, classpathsentry, classpathscoll, currentclasspath);
@@ -158,8 +171,10 @@ public class JavaIDEConfigurationTypeHandler implements IIDEConfigurationTypeHan
 		if (compilerjreversion instanceof String) {
 			javaversionstr = (String) compilerjreversion;
 		}
-		addVmInstallClassPath(project, jreentry, javaversionstr, installlocfile, monitor, currentclasspath,
-				addexportscoll);
+
+		//if a boot classpath was set by the user, don't auto-add the boot classpath for the given JRE
+		addVmInstallClassPath(project, jreentry, hasbootclasspath ? null : javaversionstr,
+				hasbootclasspath ? null : installlocfile, monitor, currentclasspath, addexportscoll);
 
 		addSourceDirectoryRemovals(project, currentclasspath, sourcedirentry);
 		addLibraryRemovals(project, currentclasspath, classpathsentry, modulepathsentry);
@@ -176,13 +191,14 @@ public class JavaIDEConfigurationTypeHandler implements IIDEConfigurationTypeHan
 			natureentry.addClassPathEntry(classpathsentry);
 			classpathsentry.initSelection();
 		}
-		if (!jreentry.isEmpty()) {
-			natureentry.addClassPathEntry(jreentry);
-			jreentry.initSelection();
+		if (jreentry != null) {
+			if (!jreentry.isEmpty()) {
+				natureentry.addClassPathEntry(jreentry);
+				jreentry.initSelection();
+			}
 		}
 
 		// TODO other java ide configurations
-		// TODO boot classpath
 	}
 
 	private static void addLibraryRemovals(ISakerProject project,
@@ -332,7 +348,7 @@ public class JavaIDEConfigurationTypeHandler implements IIDEConfigurationTypeHan
 				}
 			}
 		}
-		if (matchingvminstalls.isEmpty()) {
+		if (javaversionstr != null && matchingvminstalls.isEmpty()) {
 			//no exact match found with the install location
 			//search by java version
 			for (IVMInstallType vmitype : vminstalltypes) {
@@ -343,10 +359,6 @@ public class JavaIDEConfigurationTypeHandler implements IIDEConfigurationTypeHan
 					//matching java version for the vm
 					matchingvminstalls.add(install);
 				}
-			}
-			if (matchingvminstalls.isEmpty()) {
-				//no matching vm found based on the IDE configuration
-				return;
 			}
 		}
 		Map<IVMInstall, IClasspathEntry> presentvminstalls = getPresentVmClassPaths(currentclasspath);
