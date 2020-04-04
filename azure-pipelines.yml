@@ -44,4 +44,10 @@ steps:
     pathtoPublish: build/plugin/saker.java.ide.eclipse.jar
     artifactName: saker.java.ide.eclipse.jar
 
-
+- task: GithubRelease@0
+  displayName: 'Create GitHub Release'
+  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/v')
+  inputs:
+    gitHubConnection: saker.build.ide.eclipse-ci-release-push-2
+    repositoryName: sakerbuild/saker.java.ide.eclipse
+    assets: $(Build.ArtifactStagingDirectory)/saker.java.ide.eclipse.jar

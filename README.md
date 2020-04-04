@@ -1,5 +1,7 @@
 # saker.java.ide.eclipse
 
+![Build status](https://img.shields.io/azure-devops/build/sakerbuild/90306d09-ea75-4eae-8a9e-b89c7e29ca4a/23/master)
+
 An Eclipse IDE plugin for applying Java project configurations based on build results from the [saker.build system](https://saker.build). The plugin uses the extension point provided by the [saker.build.ide.eclipse](https://github.com/sakerbuild/saker.build.ide.eclipse) to automatically configure Java project and pass the JRE runtime configurations to the build.
 
 You can install the plugin from the same update-site as the [saker.build.ide.eclipse](https://saker.build/saker.build/doc/eclipseplugin.html) plugin.
