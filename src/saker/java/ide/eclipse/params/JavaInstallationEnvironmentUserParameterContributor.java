@@ -46,11 +46,11 @@ public class JavaInstallationEnvironmentUserParameterContributor
 		JavaRuntime.addVMInstallChangedListener(this);
 		StringJoiner installlocations = new StringJoiner(";");
 		String present = parameters.get(INSTALL_LOCATIONS_ENV_PARAMETER_NAME);
-		if (present != null) {
+		if (present != null && !present.isEmpty()) {
 			installlocations.add(present);
 		}
 		//assign plugin later, because when we query the installs, the vmAdded events fire automatically
-		//therefor we assign the plugin later, so we don't invalidate it unnecessarily
+		//therefore we assign the plugin later, so we don't invalidate it unnecessarily
 		//it is acceptable, as concurrency errors won't happen due to synchronization of methods
 		boolean foundinstall = false;
 		for (IVMInstallType vmitype : JavaRuntime.getVMInstallTypes()) {
