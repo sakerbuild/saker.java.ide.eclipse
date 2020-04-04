@@ -28,6 +28,7 @@ steps:
     runVersion: 'latestFromBranch'
     runBranch: 'refs/heads/master'
     artifactName: 'saker.build.ide.eclipse.jar'
+    path: './'
 - script: |
     set -e
     curl http://ftp.halifax.rwth-aachen.de/eclipse//technology/epp/downloads/release/2020-03/R/eclipse-rcp-2020-03-R-linux-gtk-x86_64.tar.gz -o eclipse.tar.gz
