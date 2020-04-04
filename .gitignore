@@ -6,3 +6,5 @@ secret/**
 /.saker.project.lock
 /.classpath
 /bin/
+/eclipse/
+saker.build.ide.eclipse.jar
