@@ -20,6 +20,14 @@ steps:
     echo "##vso[task.setvariable variable=BUILD_VERSION_NUMBER]$(cat META-INF/MANIFEST.MF | grep Bundle-Version: | sed -r 's/Bundle-Version: (.*)\.qualifier/\1/')"
   condition: not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
   displayName: 'Set BUILD_VERSION_NUMBER'
+- task: DownloadPipelineArtifact@2
+  inputs:
+    source: 'specific'
+    project: 'saker.build.ide.eclipse'
+    pipeline: 22
+    runVersion: 'latestFromBranch'
+    runBranch: 'refs/heads/master'
+    artifactName: 'saker.build.ide.eclipse.jar'
 - script: |
     set -e
     curl http://ftp.halifax.rwth-aachen.de/eclipse//technology/epp/downloads/release/2020-03/R/eclipse-rcp-2020-03-R-linux-gtk-x86_64.tar.gz -o eclipse.tar.gz
