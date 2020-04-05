@@ -1,0 +1,62 @@
+trigger:
+  branches:
+    include:
+    - master
+  tags:
+    include:
+    - v*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: |
+    set -e
+    echo "##vso[task.setvariable variable=BUILD_VERSION_NUMBER]$(echo $BUILD_SOURCEBRANCHNAME | sed -r 's/v(.*)/\1/')"
+  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/v')
+  displayName: 'Set BUILD_VERSION_NUMBER'
+- script: |
+    set -e
+    echo "##vso[task.setvariable variable=BUILD_VERSION_NUMBER]$(cat META-INF/MANIFEST.MF | grep Bundle-Version: | sed -r 's/Bundle-Version: (.*)\.qualifier/\1/')"
+  condition: not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
+  displayName: 'Set BUILD_VERSION_NUMBER'
+- task: DownloadPipelineArtifact@2
+  inputs:
+    source: 'specific'
+    project: 'saker.build.ide.eclipse'
+    pipeline: 22
+    runVersion: 'latestFromBranch'
+    runBranch: 'refs/heads/master'
+    artifactName: 'saker.build.ide.eclipse'
+    path: 'lib/saker.build.ide.eclipse/'
+- script: |
+    set -e
+    curl http://ftp.halifax.rwth-aachen.de/eclipse//technology/epp/downloads/release/2020-03/R/eclipse-rcp-2020-03-R-linux-gtk-x86_64.tar.gz -o eclipse.tar.gz
+    tar -xzf "eclipse.tar.gz"
+  displayName: 'Download Eclipse'
+- script: |
+    set -e
+    eclipse/eclipse -nosplash  -application org.eclipse.ant.core.antRunner -data .. -verbose -buildfile build.xml -DbuildTempFolder=build/temp -DbuildDirectory=build -Dbuild.result.folder=build/res -Dplugin.destination=build/plugin -DbuildVersionNumber=$BUILD_VERSION_NUMBER build.update.jar
+  displayName: 'Build update JAR'
+  
+- script: |
+    set -e
+    mkdir gh-release
+    cp build/plugin/saker.java.ide.eclipse.jar gh-release/
+    cp build/plugin/saker.java.ide.eclipse.ver gh-release/
+    cp update-site/features/feature.xml gh-release/
+  displayName: 'Setup GitHub Release'
+  
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish artifacts'
+  inputs:
+    pathtoPublish: gh-release/
+    artifactName: saker.java.ide.eclipse
+
+- task: GithubRelease@0
+  displayName: 'Create GitHub Release'
+  condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/v')
+  inputs:
+    gitHubConnection: saker.java.ide.eclipse-ci-release-push
+    repositoryName: sakerbuild/saker.java.ide.eclipse
+    assets: gh-release/
