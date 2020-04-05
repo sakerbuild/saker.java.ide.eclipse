@@ -14,8 +14,7 @@ resources:
       trigger:
         branches:
         - master
-        tags:
-        - v*
+        - refs/tags/v*
 
 pool:
   vmImage: 'ubuntu-latest'
