@@ -32,7 +32,7 @@ steps:
       exit 1
     fi
   condition: startsWith(variables['Build.SourceBranch'], 'refs/tags/v')
-  displayName: 'Set BUILD_VERSION_NUMBER'
+  displayName: 'Check version number - tag consistency '
 - task: DownloadPipelineArtifact@2
   inputs:
     source: 'specific'
