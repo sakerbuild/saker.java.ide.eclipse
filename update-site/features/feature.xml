@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="features.saker.java.ide.eclipse"
+      id="feature.saker.java.ide.eclipse"
       label="Java IDE support for Saker.build"
       version="111.222.334.qualifier"
       provider-name="saker.build">
